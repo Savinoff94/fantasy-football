@@ -25,7 +25,7 @@ const handleDownloadPlayerData = (req,res) => {
                 params: {id: data[0].player_id, season: '2021'},
                 headers: {
                   'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                  'x-rapidapi-key': '50969f14d2msh82dec1198045588p14141ajsnb8e0ca0d164b'
+                  'x-rapidapi-key': KEY
                 }
               };
               
