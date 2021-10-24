@@ -32,7 +32,7 @@ const handleSavePlayer = (req,res) => {
             params: {league: '39', season: '2021', team: team_id, next: '1'},
             headers: {
               'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-              'x-rapidapi-key': KEY
+              'x-rapidapi-key': process.env.KEY
             }
         };
           

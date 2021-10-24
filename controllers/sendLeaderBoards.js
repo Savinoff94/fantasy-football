@@ -2,10 +2,8 @@ const db = require('../modules/db').db;
 
 const handlesendLeaderBoards = (req,res) => {
     // console.log('huipizdadgigurda')
-    db('players')
-    .select('email')
-    .sum({points:'earned_points'})
-    .groupBy('email')
+    db('users')
+    .select('email', 'points')
     .orderBy('points', 'desc')
     .then(data => {
         // console.log(data);

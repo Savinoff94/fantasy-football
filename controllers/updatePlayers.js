@@ -25,7 +25,7 @@ const handleUpdatePlayers = (req,res,next) => {
           params: {fixture: row.next_fixure_id, team: row.team_id},
           headers: {
             'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-            'x-rapidapi-key': KEY
+            'x-rapidapi-key': process.env.KEY
           }
         };
         
@@ -44,7 +44,7 @@ const handleUpdatePlayers = (req,res,next) => {
               params: {league: '39', season: '2021', team: row.team_id, next: '1'},
               headers: {
                 'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                'x-rapidapi-key': KEY
+                'x-rapidapi-key': process.env.KEY
               }
             }
 
@@ -72,8 +72,28 @@ const handleUpdatePlayers = (req,res,next) => {
             });
             return null
           }else{
-            console.log('#######################################')
-            console.log('ebanina',obj[0].statistics)
+            // console.log('#######################################')
+
+            db('users')
+            .select('points')
+            .where({
+              email:row.email
+            })
+            .then(data => {
+              const newAmoutofPoints = data[0].points + obj[0].statistics[0].games.rating;
+              db('users')
+              .where({
+                email:row.email
+              })
+              .update({
+                points:newAmoutofPoints
+              })
+              .returning('*')
+              .then((data) => console.log('updated user points: ',data))
+              .catch((e) => console.log(e))
+            })
+            .catch((e) => console.log(e))
+
             db('players')
             .where({
               email:row.email,
@@ -96,32 +116,32 @@ const handleUpdatePlayers = (req,res,next) => {
               params: {league: '39', season: '2021', team: row.team_id, next: '1'},
               headers: {
                 'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                'x-rapidapi-key': KEY
+                'x-rapidapi-key': process.env.KEY
               }
             }
 
-              axios.request(optionsNext)
-              .then( fixureData => {
-                console.log(fixureData)
-                console.log('fixureData.data.response[0].fixture.id',fixureData.data.response[0].fixture.id)
-                console.log('fixureData.data.response[0].fixture.timestamp',fixureData.data.response[0].fixture.timestamp)
-                db('players')
-                .where({
-                  email:row.email,
-                  player_id:row.player_id,
-                  player_index:row.player_index
-                })
-                .update({
-                    next_fixure_id:fixureData.data.response[0].fixture.id,
-                    next_fixure_date:fixureData.data.response[0].fixture.timestamp,
-                })
-                .returning('*')
-                .then(data => console.log("input when obj not null:",data))
-                .catch(e => console.log(e))
-              }
-              ).catch(e => {
-                  console.log(e)
-              });
+            axios.request(optionsNext)
+            .then( fixureData => {
+              console.log(fixureData)
+              console.log('fixureData.data.response[0].fixture.id',fixureData.data.response[0].fixture.id)
+              console.log('fixureData.data.response[0].fixture.timestamp',fixureData.data.response[0].fixture.timestamp)
+              db('players')
+              .where({
+                email:row.email,
+                player_id:row.player_id,
+                player_index:row.player_index
+              })
+              .update({
+                  next_fixure_id:fixureData.data.response[0].fixture.id,
+                  next_fixure_date:fixureData.data.response[0].fixture.timestamp,
+              })
+              .returning('*')
+              .then(data => console.log("input when obj not null:",data))
+              .catch(e => console.log(e))
+            }
+            ).catch(e => {
+                console.log(e)
+            });
           }
 
         }

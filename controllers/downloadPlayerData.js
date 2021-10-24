@@ -3,7 +3,9 @@ const axios = require("axios").default;
 
 const handleDownloadPlayerData = (req,res) => {
     const {email,player_index} = req.body;
-    // console.log('req.body download player data', req.body)
+    
+    console.log("handleDownloadPlayerData")
+
     if(!email || !player_index){
         return res.status(404).json('cant download player')
     }
@@ -19,22 +21,30 @@ const handleDownloadPlayerData = (req,res) => {
             res.status(404).send('no player data')
         }else{
             // console.log('data[0]',data[0])
-            const options = {
-                method: 'GET',
-                url: 'https://api-football-v1.p.rapidapi.com/v3/players',
-                params: {id: data[0].player_id, season: '2021'},
-                headers: {
-                  'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                  'x-rapidapi-key': KEY
-                }
-              };
+            db.select('data')
+            .from('players_base')
+            .where({id:data[0].player_id})
+            .then(data => {
+                console.log("existing player", data[0].data)
+                res.status(200).json({data:data[0].data})
+            })
+            .catch((e) => console.log(e))
+            // const options = {
+            //     method: 'GET',
+            //     url: 'https://api-football-v1.p.rapidapi.com/v3/players',
+            //     params: {id: data[0].player_id, season: '2021'},
+            //     headers: {
+            //       'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+            //       'x-rapidapi-key': process.env.KEY
+            //     }
+            //   };
               
-              axios.request(options).then(function (response) {
-                // console.log(response.data);
-                res.status(200).json({data:response.data})
-              }).catch(function (error) {
-                console.error(error);
-              });
+            //   axios.request(options).then(function (response) {
+            //     // console.log(response.data);
+            //     res.status(200).json({data:response.data})
+            //   }).catch(function (error) {
+            //     console.error(error);
+            //   });
         }
     })
     .catch((e) => {
